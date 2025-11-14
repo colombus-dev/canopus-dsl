@@ -1,0 +1,10 @@
+pattern Q1 = [step="Visualization"]+
+pattern Q2 = * -> [step="Visualization"]
+pattern Qn = [algoName != "read_csv",step="Data Loading"]
+pattern Q3 = * -> [step="Model Training"]
+pattern Q4 = * -> [step="Library Loading"]
+pattern Q5 = [step!="Library Loading"] -> [step="Library Loading"]
+pattern ST_FE = (Q1 | Q2 | Q3)
+pattern Q6 = Q5 -> ST_FE
+pattern Q8_R = Q5* -> * -> SP6 -> * -> SP7 -> * -> SP8
+pattern Q9 = start -> [step="Visualization",library="nltk"] -> end
