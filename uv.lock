@@ -40,7 +40,7 @@ wheels = [
 [[package]]
 name = "canopus-dsl"
 version = "0.1.0"
-source = { virtual = "." }
+source = { editable = "." }
 dependencies = [
     { name = "antlr4-python3-runtime" },
     { name = "antlr4-tools" },
@@ -53,9 +53,6 @@ requires-dist = [
     { name = "antlr4-tools", specifier = ">=0.2.2" },
     { name = "pydantic", specifier = ">=2.12.4" },
 ]
-
-[package.metadata.requires-dev]
-dev = []
 
 [[package]]
 name = "install-jdk"

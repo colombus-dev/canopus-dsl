@@ -3,6 +3,9 @@ name = "canopus-dsl"
 version = "0.1.0"
 description = "Canopus DSL - The DSL for ML pipelines pattern matching"
 readme = "README.md"
+authors = [
+    { name = "Nicolas Lacroix", email = "nicolas.lacroix@univ-cotedazur.fr" }
+]
 requires-python = ">=3.10"
 dependencies = [
     "antlr4-python3-runtime>=4.13.2",
@@ -10,5 +13,6 @@ dependencies = [
     "pydantic>=2.12.4",
 ]
 
-[dependency-groups]
-dev = []
+[build-system]
+requires = ["uv_build>=0.9.0,<0.10.0"]
+build-backend = "uv_build"

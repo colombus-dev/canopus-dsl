@@ -1,8 +1,8 @@
 from pydantic import BaseModel
 from typing import List, Literal
 
-from canopus.generated.CanopusDSLParser import CanopusDSLParser
-from canopus.generated.CanopusDSLListener import CanopusDSLListener
+from canopus_dsl.generated.CanopusDSLParser import CanopusDSLParser
+from canopus_dsl.generated.CanopusDSLListener import CanopusDSLListener
 
 # Pydantic model
 

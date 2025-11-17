@@ -2,9 +2,9 @@ import sys
 
 from antlr4 import FileStream, CommonTokenStream, ParseTreeWalker
 
-from canopus import ConcreteCanopusDSLListener
-from canopus.generated.CanopusDSLLexer import CanopusDSLLexer
-from canopus.generated.CanopusDSLParser import CanopusDSLParser
+from canopus_dsl import ConcreteCanopusDSLListener
+from canopus_dsl.generated.CanopusDSLLexer import CanopusDSLLexer
+from canopus_dsl.generated.CanopusDSLParser import CanopusDSLParser
 
 
 def main(argv: list[str] | None = None):
