@@ -10,7 +10,7 @@ else:
 
 def serializedATN():
     return [
-        4,1,18,102,2,0,7,0,2,1,7,1,2,2,7,2,2,3,7,3,2,4,7,4,2,5,7,5,2,6,7,
+        4,1,19,102,2,0,7,0,2,1,7,1,2,2,7,2,2,3,7,3,2,4,7,4,2,5,7,5,2,6,7,
         6,2,7,7,7,2,8,7,8,2,9,7,9,1,0,4,0,22,8,0,11,0,12,0,23,1,0,1,0,1,
         1,1,1,1,1,1,1,1,1,1,2,1,2,1,2,1,2,1,2,1,2,1,2,1,2,1,2,1,2,1,2,1,
         2,1,2,1,2,3,2,47,8,2,1,3,1,3,1,3,5,3,52,8,3,10,3,12,3,55,9,3,1,4,
@@ -63,7 +63,7 @@ class CanopusDSLParser ( Parser ):
                       "<INVALID>", "<INVALID>", "<INVALID>", "<INVALID>", 
                       "<INVALID>", "<INVALID>", "<INVALID>", "<INVALID>", 
                       "START_OP", "END_OP", "ID", "LABEL", "STRING", "WS", 
-                      "WILDCARD" ]
+                      "WILDCARD", "COMMENT" ]
 
     RULE_program = 0
     RULE_patternDef = 1
@@ -99,6 +99,7 @@ class CanopusDSLParser ( Parser ):
     STRING=16
     WS=17
     WILDCARD=18
+    COMMENT=19
 
     def __init__(self, input:TokenStream, output:TextIO = sys.stdout):
         super().__init__(input, output)

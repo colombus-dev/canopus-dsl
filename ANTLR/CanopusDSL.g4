@@ -46,3 +46,4 @@ LABEL: [a-z][a-zA-Z0-9_]*;
 STRING: '"' (~["\r\n])* '"';
 WS: [ \t\r\n]+ -> skip;
 WILDCARD: '*';
+COMMENT: '#' ~[\r\n]* -> skip;
