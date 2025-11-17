@@ -1,0 +1,29 @@
+{
+  "name": "canopus-dsl",
+  "version": "0.1.0",
+  "description": "Canopus DSL - The DSL for ML pipelines pattern matching",
+  "main": "index.js",
+  "exports": {
+    "./lexer": "./generated/CanopusDSLLexer.js",
+    "./listener": "./generated/CanopusDSLListener.js",
+    "./parser": "./generated/CanopusDSLParser.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/colombus-dev/canopus-dsl.git"
+  },
+  "keywords": [
+    "pattern-matching",
+    "domain-specific-language",
+    "dsl",
+    "canopus",
+    "colombus",
+    "ml-profile"
+  ],
+  "author": "Nicolas Lacroix <nicolas.lacroix@univ-cotedazur.fr>",
+  "license": "Apache-2.0",
+  "packageManager": "yarn@4.6.0",
+  "dependencies": {
+    "antlr4": "^4.13.2"
+  }
+}
