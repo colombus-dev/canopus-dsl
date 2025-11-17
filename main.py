@@ -1,27 +1,16 @@
+from pathlib import Path
 import sys
 
-from antlr4 import FileStream, CommonTokenStream, ParseTreeWalker
-
-from canopus_dsl import ConcreteCanopusDSLListener
-from canopus_dsl.generated.CanopusDSLLexer import CanopusDSLLexer
-from canopus_dsl.generated.CanopusDSLParser import CanopusDSLParser
+from canopus_dsl import parse_string
 
 
 def main(argv: list[str] | None = None):
     if not argv or len(argv) < 2:
         raise RuntimeError("Invalid cmd arguments")
-    # read the canopus file and parse its content
-    input = FileStream(argv[1])
-    lexer = CanopusDSLLexer(input)
-    stream = CommonTokenStream(lexer)
-    parser = CanopusDSLParser(stream)
-    tree = parser.program()
-    # initialize the listener
-    my_listener = ConcreteCanopusDSLListener()
-    walker = ParseTreeWalker()
-    walker.walk(my_listener, tree)  # type: ignore
+    content = Path(argv[1]).read_text()
+    listener = parse_string(content)
     # print the constructed model
-    for pattern in my_listener.patterns:
+    for pattern in listener.patterns:
         print("pattern name=", pattern.name)
         for group in pattern.sequence:
             print("\t- ", group)
