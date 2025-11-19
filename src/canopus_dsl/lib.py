@@ -1,5 +1,5 @@
 from pydantic import BaseModel
-from typing import List, Literal
+from typing import Any, List, Literal
 
 from canopus_dsl.generated.CanopusDSLParser import CanopusDSLParser
 from canopus_dsl.generated.CanopusDSLListener import CanopusDSLListener
@@ -50,6 +50,7 @@ class Pattern(BaseModel):
 
 class Program(BaseModel):
     patterns: List[Pattern]
+    imports: List[str]
 
 
 # Concrete listener
@@ -57,36 +58,37 @@ class Program(BaseModel):
 
 class ConcreteCanopusDSLListener(CanopusDSLListener):
     def __init__(self):
-        self.values = []  # stack for building expressions
-        self.patterns = []  # final output for Program
+        self.program: Program | None = None
+        self.__values: List[Any] = []  # stack
+        self.__patterns: List[Pattern] = []
+        self.__imports: List[str] = []
 
     # ------------------------------------
     # program
     # ------------------------------------
     def exitProgram(self, ctx: CanopusDSLParser.ProgramContext):
-        # all patternDefs already collected
-        self.values.append(Program(patterns=self.patterns))
+        self.program = Program(patterns=self.__patterns, imports=self.__imports)
 
     # ------------------------------------
     # patternDef : 'pattern' ID '=' patternExpr
     # ------------------------------------
     def exitPatternDef(self, ctx: CanopusDSLParser.PatternDefContext):
         pattern_name = ctx.ID().getText()
-        pattern_expr = self.values.pop()
+        pattern_expr = self.__values.pop()
         pattern = Pattern(name=pattern_name, sequence=pattern_expr)
-        self.patterns.append(pattern)
+        self.__patterns.append(pattern)
 
     # ------------------------------------
     # patternExpr : START_OP '->' middleExpr '->' END_OP
     #             | START_OP '->' END_OP
     # ------------------------------------
     def exitPatternExpr(self, ctx: CanopusDSLParser.PatternExprContext):
-        seq = self.values.pop() if self.values else []  # list of Expr
+        seq = self.__values.pop() if self.__values else []  # list of Expr
         if ctx.START_OP():
             seq = [StartExpr()] + seq
         if ctx.END_OP():
             seq = seq + [EndExpr()]
-        self.values.append(seq)
+        self.__values.append(seq)
 
     # ------------------------------------
     # middleExpr : primary ('->' primary)*
@@ -97,17 +99,17 @@ class ConcreteCanopusDSLListener(CanopusDSLListener):
 
         # pop items in reverse construction order
         for _ in range(count):
-            items.append(self.values.pop())
+            items.append(self.__values.pop())
 
         items.reverse()
-        self.values.append(items)
+        self.__values.append(items)
 
     # ------------------------------------
     # multipExpr : primary multipOperator?
     # ------------------------------------
     def exitMultipExpr(self, ctx: CanopusDSLParser.MultipExprContext):
         if ctx.multipOperator():
-            last_expr: Expr = self.values[-1]
+            last_expr: Expr = self.__values[-1]
             last_expr.multiplicity = ctx.multipOperator().getText()
 
     # ------------------------------------
@@ -118,12 +120,12 @@ class ConcreteCanopusDSLListener(CanopusDSLListener):
         items = []
 
         for _ in range(expr_count):
-            items.append(self.values.pop())
+            items.append(self.__values.pop())
 
         items.reverse()
 
         alt = AlternativeExpr(alternatives=items)
-        self.values.append(alt)
+        self.__values.append(alt)
 
     # ------------------------------------
     # elementExpr : '[' condition (',' condition)* ']'
@@ -133,22 +135,22 @@ class ConcreteCanopusDSLListener(CanopusDSLListener):
         conds = []
 
         for _ in range(cond_count):
-            conds.append(self.values.pop())
+            conds.append(self.__values.pop())
 
         conds.reverse()
-        self.values.append(ElementExpr(conditions=conds))
+        self.__values.append(ElementExpr(conditions=conds))
 
     # ------------------------------------
     # id : ID
     # ------------------------------------
     def exitId(self, ctx: CanopusDSLParser.IdContext):
-        self.values.append(IdExpr(name=ctx.ID().getText()))
+        self.__values.append(IdExpr(name=ctx.ID().getText()))
 
     # ------------------------------------
     # wildcard : '*'
     # ------------------------------------
     def exitWildcard(self, ctx: CanopusDSLParser.WildcardContext):
-        self.values.append(WildcardExpr())
+        self.__values.append(WildcardExpr())
 
     # ------------------------------------
     # expr : primary ('->' primary)*
@@ -159,16 +161,16 @@ class ConcreteCanopusDSLListener(CanopusDSLListener):
         items = []
 
         for _ in range(count):
-            items.append(self.values.pop())
+            items.append(self.__values.pop())
 
         items.reverse()
 
         # if only one primary, expr = that primary
         if len(items) == 1:
-            self.values.append(items[0])
+            self.__values.append(items[0])
         else:
             # treat full expr as sequence of primaries
-            self.values.append(items)
+            self.__values.append(items)
 
     # ------------------------------------
     # condition : ID comparator STRING
@@ -177,4 +179,10 @@ class ConcreteCanopusDSLListener(CanopusDSLListener):
         key = ctx.LABEL().getText()
         op = ctx.comparator().getText()
         value = ctx.STRING().getText().strip('"')
-        self.values.append(Condition(key=key, op=op, value=value))
+        self.__values.append(Condition(key=key, op=op, value=value))
+
+    # ------------------------------------
+    # imports : 'import' ID (',' ID)*
+    # ------------------------------------
+    def exitImportPatterns(self, ctx: CanopusDSLParser.ImportPatternsContext):
+        self.__imports.extend([import_id.getText() for import_id in ctx.ID()])
