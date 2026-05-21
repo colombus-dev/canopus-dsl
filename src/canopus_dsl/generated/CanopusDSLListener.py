@@ -17,6 +17,15 @@ class CanopusDSLListener(ParseTreeListener):
         pass
 
 
+    # Enter a parse tree produced by CanopusDSLParser#importPatterns.
+    def enterImportPatterns(self, ctx:CanopusDSLParser.ImportPatternsContext):
+        pass
+
+    # Exit a parse tree produced by CanopusDSLParser#importPatterns.
+    def exitImportPatterns(self, ctx:CanopusDSLParser.ImportPatternsContext):
+        pass
+
+
     # Enter a parse tree produced by CanopusDSLParser#patternDef.
     def enterPatternDef(self, ctx:CanopusDSLParser.PatternDefContext):
         pass

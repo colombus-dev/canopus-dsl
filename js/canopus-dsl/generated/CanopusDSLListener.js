@@ -14,6 +14,15 @@ export default class CanopusDSLListener extends antlr4.tree.ParseTreeListener {
 	}
 
 
+	// Enter a parse tree produced by CanopusDSLParser#importPatterns.
+	enterImportPatterns(ctx) {
+	}
+
+	// Exit a parse tree produced by CanopusDSLParser#importPatterns.
+	exitImportPatterns(ctx) {
+	}
+
+
 	// Enter a parse tree produced by CanopusDSLParser#patternDef.
 	enterPatternDef(ctx) {
 	}

@@ -1,0 +1,7 @@
+import Q3, Q4
+
+pattern Q1 = [step="Visualization"]+
+pattern Q2 = * -> [step="Visualization"]
+pattern Qn = [algoName != "read_csv",step="Data Loading"]
+pattern ST_FE = (Q1 | Q2 | Q3)
+pattern Q5 = start -> Q1 -> * -> Q3 -> Q4 -> end
