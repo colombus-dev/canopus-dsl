@@ -1,0 +1,31 @@
+# See https://pre-commit.com for more information
+# See https://pre-commit.com/hooks.html for more hooks
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: 3e8a8703264a2f4a69428a0aa4dcb512790b2c8c # v6.0.0
+    hooks:
+      - id: check-added-large-files
+      - id: check-toml
+      - id: check-yaml
+        args:
+          - --unsafe
+      - id: check-merge-conflict
+      - id: end-of-file-fixer
+      - id: trailing-whitespace
+      - id: check-added-large-files
+        args: [--maxkb=1000]
+      - id: debug-statements
+  - repo: local
+    hooks:
+      - id: generate-canopus-dsl
+        name: generate Canopus DSL
+        entry: uv run bash scripts/compile.sh
+        require_serial: true
+        language: unsupported
+        types: [bash]
+      - id: quality-check
+        name: quality check
+        entry: uv run bash scripts/check.sh
+        require_serial: true
+        language: unsupported
+        types: [bash]

@@ -10,13 +10,27 @@
 ### Compile the grammar and generate the corresponding Python parser and lexer
 
 ```bash
-$ cd ANTLR
-$ ./compile.sh
+$ uv run bash scripts/compile.sh
 ```
 
 Generated files will be located under the [canopus/generated](./canopus/generated/) directory.
 
 Once generated, update the canopus library accordingly (`ConcreteCanopusDSLListener` for instance).
+
+### Run quality gate
+
+Install the pre-commit as follows:
+
+```bash
+$ uv run prek install
+```
+
+Manually run code-related quality gate:
+
+```bash
+$ uv run prek run               # To run pre-commit on staged files
+$ uv run bash scripts/check.sh  # or manually check script on all files
+```
 
 ## Package distribution
 

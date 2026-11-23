@@ -1,4 +1,4 @@
-from antlr4 import InputStream, CommonTokenStream, ParseTreeWalker
+from antlr4 import CommonTokenStream, InputStream, ParseTreeWalker
 
 from canopus_dsl import ConcreteCanopusDSLListener
 from canopus_dsl.generated.CanopusDSLLexer import CanopusDSLLexer
