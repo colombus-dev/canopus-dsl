@@ -2,6 +2,7 @@ from typing import Any, Literal
 
 from pydantic import BaseModel
 
+from canopus_dsl.errors import ParseError
 from canopus_dsl.generated.CanopusDSLListener import CanopusDSLListener
 from canopus_dsl.generated.CanopusDSLParser import CanopusDSLParser
 
@@ -40,7 +41,7 @@ class EndExpr(BaseModel):
     name: Literal["#end"] = "#end"
 
 
-class WildcardExpr(BaseModel):
+class WildcardExpr(Expr):
     name: Literal["*"] = "*"
 
 
@@ -60,6 +61,7 @@ class Program(BaseModel):
 class ConcreteCanopusDSLListener(CanopusDSLListener):
     def __init__(self) -> None:
         self.program: Program | None = None
+        self.errors: list[ParseError] = []
         self.__values: list[Any] = []  # stack
         self.__patterns: list[Pattern] = []
         self.__imports: list[str] = []
