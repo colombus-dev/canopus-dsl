@@ -1,3 +1,0 @@
-# Test mono
-
-pattern Q = start -> [step="Visualization"]+ -> * -> [algoName != "read_csv",step="Data Loading"] -> end  # strict start and end

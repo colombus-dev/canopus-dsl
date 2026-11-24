@@ -215,3 +215,5 @@ postgres_data/
 .antlr
 *.interp
 *.tokens
+
+graphify-out/
