@@ -7,6 +7,6 @@ set -x
 # pyrefly check src/
 # pyrefly coverage check src/
 ruff check --fix src/
-ruff format --check src/
+ruff format src/
 vulture src/
 bandit -r src/

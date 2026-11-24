@@ -42,6 +42,24 @@ $ uv build
 
 The build package will be located under the *dist/* directory.
 
+## Usage
+
+```bash
+$ python main.py <file.canopus>
+```
+
+Exit codes:
+
+| Code | Meaning |
+|---|---|
+| `0` | Clean model (warnings allowed) |
+| `1` | Parse errors or error-severity issues |
+| `2` | Usage error |
+
+Diagnostics go to stderr: parse errors as `line L:C: <message>`, model issues
+as `severity: code: message`. The model goes to stdout. `parse_string` never
+raises: invalid input yields a listener with a populated `.errors` list.
+
 ## Examples
 
-Examples of the canopus DSL can be found under the [ANTLR/resources](./ANTLR/resources/) directory and package use in the [main.py](./main.py) file.
+Examples of the canopus DSL can be found under the [tests/resources](./tests/resources/) directory and package use in the [main.py](./main.py) file.

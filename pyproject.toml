@@ -37,6 +37,9 @@ project-includes = [
 [tool.ruff]
 exclude = ["src/canopus_dsl/generated"]
 
+[tool.pytest.ini_options]
+pythonpath = ["."]
+
 [tool.vulture]
 min_confidence = 70
 sort_by_size = true
