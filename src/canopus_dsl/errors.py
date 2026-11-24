@@ -39,14 +39,15 @@ class CollectingErrorListener(ErrorListener):
         """
         self.__collected_errors = collected_errors
 
+    # pyrefly: ignore[bad-override-param-name]
     def syntaxError(
         self,
-        recognizer,
-        offendingSymbol,
+        _recognizer,
+        _offendingSymbol,
         line: int,
         column: int,
         msg: str,
-        e,
+        _e,
     ) -> None:
         self.__collected_errors.append(
             ParseError(line=line, column=column, message=msg)
