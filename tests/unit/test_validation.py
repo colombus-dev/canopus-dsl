@@ -1,7 +1,6 @@
 """Semantic validation: model invariants reported as Issues, never raised."""
 
 import pytest
-
 from canopus_dsl import parse_string
 from canopus_dsl.errors import Issue
 from canopus_dsl.validation import validate
@@ -53,7 +52,7 @@ def test_custom_program_rule():
         severity="error",
         message="Just my custom error message",
     )
-    def my_program_rule(_program) -> list[Issue]:
+    def my_program_rule(_ctx) -> list[Issue]:
         return [
             expected_issue
         ]
@@ -72,7 +71,7 @@ def test_custom_leaf_rule():
             severity="error",
             message="Just my custom error message",
         )
-    def my_leaf_rule(_node, _pattern_name) -> list[Issue]:
+    def my_leaf_rule(_node, _pattern, _ctx) -> list[Issue]:
         return [
             expected_issue
         ]

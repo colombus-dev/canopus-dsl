@@ -48,4 +48,6 @@ class CollectingErrorListener(ErrorListener):
         msg: str,
         e,
     ) -> None:
-        self.__collected_errors.append(ParseError(line=line, column=column, message=msg))
+        self.__collected_errors.append(
+            ParseError(line=line, column=column, message=msg)
+        )
