@@ -86,6 +86,18 @@ def test_ghost_in_nested_alternative():
     )
 
 
+def test_ghost_in_sequence_alternative():
+    """An undefined name inside a multi-step alternative is unknown-reference."""
+    listener = parse_string(
+        "pattern A = (Q1 -> Ghost | Q2)\n"
+        "pattern Q1 = *\npattern Q2 = *\n"
+    )
+    issues = resolve(listener.program)
+    assert any(
+        i.code == "unknown-reference" and "Ghost" in i.message for i in issues
+    )
+
+
 def test_import_resolves_with_externals():
     """An import satisfied by external_patterns resolves cleanly."""
     listener = parse_string("import Q9\npattern A = Q9\n")

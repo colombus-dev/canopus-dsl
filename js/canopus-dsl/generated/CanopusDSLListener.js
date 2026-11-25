@@ -50,12 +50,21 @@ export default class CanopusDSLListener extends antlr4.tree.ParseTreeListener {
 	}
 
 
-	// Enter a parse tree produced by CanopusDSLParser#multipExpr.
-	enterMultipExpr(ctx) {
+	// Enter a parse tree produced by CanopusDSLParser#wildcardAtom.
+	enterWildcardAtom(ctx) {
 	}
 
-	// Exit a parse tree produced by CanopusDSLParser#multipExpr.
-	exitMultipExpr(ctx) {
+	// Exit a parse tree produced by CanopusDSLParser#wildcardAtom.
+	exitWildcardAtom(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CanopusDSLParser#quantified.
+	enterQuantified(ctx) {
+	}
+
+	// Exit a parse tree produced by CanopusDSLParser#quantified.
+	exitQuantified(ctx) {
 	}
 
 
@@ -83,15 +92,6 @@ export default class CanopusDSLListener extends antlr4.tree.ParseTreeListener {
 
 	// Exit a parse tree produced by CanopusDSLParser#id.
 	exitId(ctx) {
-	}
-
-
-	// Enter a parse tree produced by CanopusDSLParser#wildcard.
-	enterWildcard(ctx) {
-	}
-
-	// Exit a parse tree produced by CanopusDSLParser#wildcard.
-	exitWildcard(ctx) {
 	}
 
 

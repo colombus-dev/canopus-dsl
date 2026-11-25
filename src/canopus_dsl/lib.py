@@ -25,8 +25,14 @@ class ElementExpr(Expr):
     conditions: list[Condition]
 
 
+class SequenceExpr(Expr):
+    """A ``->`` step sequence: each group alternative is one mini-pipeline."""
+
+    steps: list["Expr"]
+
+
 class AlternativeExpr(Expr):
-    alternatives: list["Expr"]  # forward reference
+    alternatives: list["Expr"]  # single Expr or SequenceExpr per alternative
 
 
 class IdExpr(Expr):
@@ -83,7 +89,9 @@ class ConcreteCanopusDSLListener(CanopusDSLListener):
 
     # ------------------------------------
     # patternExpr : START_OP '->' middleExpr '->' END_OP
-    #             | START_OP '->' END_OP
+    #             | START_OP '->' middleExpr
+    #             | middleExpr '->' END_OP
+    #             | middleExpr
     # ------------------------------------
     def exitPatternExpr(self, ctx: CanopusDSLParser.PatternExprContext) -> None:
         seq = self.__values.pop() if self.__values else []  # list of Expr
@@ -94,7 +102,7 @@ class ConcreteCanopusDSLListener(CanopusDSLListener):
         self.__values.append(seq)
 
     # ------------------------------------
-    # middleExpr : primary ('->' primary)*
+    # middleExpr : multipExpr ('->' multipExpr)*
     # ------------------------------------
     def exitMiddleExpr(self, ctx: CanopusDSLParser.MiddleExprContext) -> None:
         count = len(ctx.multipExpr())
@@ -108,15 +116,19 @@ class ConcreteCanopusDSLListener(CanopusDSLListener):
         self.__values.append(items)
 
     # ------------------------------------
-    # multipExpr : primary multipOperator?
+    # multipExpr : WILDCARD # wildcardAtom
+    #            | primary multipOperator? # quantified
     # ------------------------------------
-    def exitMultipExpr(self, ctx: CanopusDSLParser.MultipExprContext) -> None:
+    def exitWildcardAtom(self, ctx: CanopusDSLParser.WildcardAtomContext) -> None:
+        self.__values.append(WildcardExpr())
+
+    def exitQuantified(self, ctx: CanopusDSLParser.QuantifiedContext) -> None:
         if ctx.multipOperator():
             last_expr: Expr = self.__values[-1]
             last_expr.multiplicity = ctx.multipOperator().getText()
 
     # ------------------------------------
-    # alternativeExpr : '(' expr ('|' expr)+ ')'
+    # alternativeExpr : '(' expr ('|' expr)* ')'
     # ------------------------------------
     def exitAlternativeExpr(self, ctx: CanopusDSLParser.AlternativeExprContext) -> None:
         expr_count = 1 + len(ctx.expr()) - 1
@@ -150,17 +162,11 @@ class ConcreteCanopusDSLListener(CanopusDSLListener):
         self.__values.append(IdExpr(name=ctx.ID().getText()))
 
     # ------------------------------------
-    # wildcard : '*'
-    # ------------------------------------
-    def exitWildcard(self, ctx: CanopusDSLParser.WildcardContext) -> None:
-        self.__values.append(WildcardExpr())
-
-    # ------------------------------------
-    # expr : primary ('->' primary)*
+    # expr : multipExpr ('->' multipExpr)*
     # (not directly used in final pattern, but used for alternatives)
     # ------------------------------------
     def exitExpr(self, ctx: CanopusDSLParser.ExprContext) -> None:
-        count = len(ctx.primary())
+        count = len(ctx.multipExpr())
         items = []
 
         for _ in range(count):
@@ -168,12 +174,11 @@ class ConcreteCanopusDSLListener(CanopusDSLListener):
 
         items.reverse()
 
-        # if only one primary, expr = that primary
+        # a multi-step expr is a SequenceExpr; a single step stays the Expr
         if len(items) == 1:
             self.__values.append(items[0])
         else:
-            # treat full expr as sequence of primaries
-            self.__values.append(items)
+            self.__values.append(SequenceExpr(steps=items))
 
     # ------------------------------------
     # condition : ID comparator STRING

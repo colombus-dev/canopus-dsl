@@ -1,8 +1,10 @@
 """Semantic validation: model invariants reported as Issues, never raised."""
 
 import pytest
+
 from canopus_dsl import parse_string
 from canopus_dsl.errors import Issue
+from canopus_dsl.lib import AlternativeExpr, IdExpr, SequenceExpr
 from canopus_dsl.validation import validate
 
 
@@ -11,9 +13,6 @@ from canopus_dsl.validation import validate
     [
         # Duplicate pattern names
         ("pattern Q = *\npattern Q = *\n", ["duplicate-pattern"]),
-        # Wildcard quantifiers
-        ("pattern P = *+\n", ["wildcard-quantifier"]),
-        ("pattern P = **\n", ["wildcard-quantifier"]),
         # Valid inputs
         ('pattern Q = start -> [step = "X"] -> end\n', []),
         ("pattern A = *\npattern B = *\n", []),
@@ -35,7 +34,6 @@ def test_validation_scenarios(input_code, expected_codes):
     for issue in issues:
         assert issue.code in expected_codes or issue.code in [
             "duplicate-pattern",
-            "wildcard-quantifier",
         ], f"Unexpected issue code '{issue.code}' found in {found_codes}"
 
 
@@ -43,6 +41,22 @@ def test_clean_program_yields_no_issues():
     """A normal pipeline program validates with zero noise."""
     listener = parse_string('pattern Q = start -> [step = "X"] -> end\n')
     assert validate(listener.program) == []
+
+
+def test_sequence_alternative_is_sequence_expr():
+    """(Q1 -> Q2 | Q3) keeps each alternative one typed node, never a list."""
+    listener = parse_string(
+        "pattern A = (Q1 -> Q2 | Q3)\n"
+        "pattern Q1 = *\npattern Q2 = *\npattern Q3 = *\n"
+    )
+    assert listener.errors == []
+    alt = listener.program.patterns[0].sequence[0]
+    assert isinstance(alt, AlternativeExpr)
+    first, second = alt.alternatives
+    assert isinstance(first, SequenceExpr)
+    assert first.steps == [IdExpr(name="Q1"), IdExpr(name="Q2")]
+    assert second == IdExpr(name="Q3")
+    assert not any(isinstance(item, list) for item in alt.alternatives)
 
 
 def test_custom_program_rule():

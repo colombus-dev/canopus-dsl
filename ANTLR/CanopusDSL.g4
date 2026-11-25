@@ -2,13 +2,14 @@ grammar CanopusDSL;
 
 // ---------------------- Parser rules ----------------------
 
-program: importPatterns* patternDef+ EOF;
+program: (importPatterns | patternDef)+ EOF;
 
 importPatterns: 'import' ID (',' ID)*;
 
 patternDef: 'pattern' ID '=' patternExpr;
 
 // A pattern can contain multiple middleExpr and start with 'start' or end with 'end'
+// (a pipeline needs at least one middleExpr between 'start' and 'end')
 patternExpr:
 	START_OP '->' middleExpr '->' END_OP
 	| START_OP '->' middleExpr
@@ -18,20 +19,20 @@ patternExpr:
 // A middle expressions is a sequence of multipExpr separated by ->
 middleExpr: multipExpr ('->' multipExpr)*;
 
-// A multiple expression is a primary expression with an optional multiplicity operator
-multipExpr: primary multipOperator?;
+// A multiple expression is a wildcard atom or a primary expression with an
+// optional multiplicity operator; a wildcard never takes a quantifier.
+multipExpr: WILDCARD # wildcardAtom | primary multipOperator? # quantified;
 
 // Primary (atomic) units of an expression
 primary:
-	'(' expr ('|' expr)+ ')'				# alternativeExpr
+	'(' expr ('|' expr)* ')'				# alternativeExpr
 	| '[' condition (',' condition)* ']'	# elementExpr
-	| ID									# id
-	| WILDCARD								# wildcard; // TODO: remove wildcard from primary to avoid *+
+	| ID									# id;
 
 // Multiplicity operator (like in regular expressions)
 multipOperator: '*' | '+';
 
-expr: primary ('->' primary)*;
+expr: multipExpr ('->' multipExpr)*;
 
 // Conditions inside [...]
 condition: LABEL comparator STRING;

@@ -13,7 +13,8 @@
 $ uv run bash scripts/compile.sh
 ```
 
-Generated files will be located under the [canopus/generated](./canopus/generated/) directory.
+Generated files will be located under [src/canopus_dsl/generated](./src/canopus_dsl/generated/)
+(Python) and [js/canopus-dsl/generated](./js/canopus-dsl/generated/) (JavaScript).
 
 Once generated, update the canopus library accordingly (`ConcreteCanopusDSLListener` for instance).
 
@@ -59,6 +60,37 @@ Exit codes:
 Diagnostics go to stderr: parse errors as `line L:C: <message>`, model issues
 as `severity: code: message`. The model goes to stdout. `parse_string` never
 raises: invalid input yields a listener with a populated `.errors` list.
+
+## DSL syntax
+
+A program is a sequence of pattern definitions and imports in any order:
+
+```canopus
+import Q3, Q4
+
+pattern Q1 = [step="Visualization"]+
+pattern Q2 = start -> Q1 -> * -> Q3 -> end
+```
+
+Rules:
+
+- **Patterns** — `pattern <Name> = <expr>`. Names start with an uppercase
+  letter (`Q1`, `Q8_R`).
+- **Imports** — `import <Name> (, <Name>)*`. Imports may appear before, among,
+  or after pattern definitions.
+- **Sequence** — steps chained with `->`, optionally anchored by `start` and
+  `end`. An anchored pipeline needs at least one step between `start` and
+  `end`: `start -> end` is a parse error.
+- **Wildcard** — `*` matches any single step. It never takes a multiplicity:
+  `*+` and `**` are parse errors.
+- **Element** — `[<label> <op> <value>]` with `=` or `!=`; conditions are
+  comma-separated, e.g. `[algoName != "read_csv", step="Data Loading"]`.
+- **Multiplicity** — `*` (zero or more) or `+` (one or more) after a primary,
+  e.g. `[step="X"]+` or `Q5*`.
+- **Group** — `( <expr> (| <expr>)* )`: alternatives, each a full sequence.
+  Single-element groups are legal (`(Q1)`); empty groups are not (`()` is a
+  parse error); quantified primaries work inside groups, e.g. `(Q1* | [step="X"]+)`.
+- **Comments** — `#` starts a comment running to the end of the line.
 
 ## Examples
 

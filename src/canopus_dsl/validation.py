@@ -3,7 +3,6 @@
 Rules come in two kinds:
 - program rules: see the whole Program (e.g. duplicate pattern names)
 - leaf rules:  see one expression plus the name of its owning pattern
-  (e.g. quantified wildcard)
 Adding an invariant = adding one function and registering it.
 """
 
@@ -11,7 +10,7 @@ from collections.abc import Iterable
 
 from canopus_dsl.checking import LeafRule, ProgramContext, ProgramRule
 from canopus_dsl.errors import Issue
-from canopus_dsl.lib import Pattern, Program, WildcardExpr
+from canopus_dsl.lib import Program
 
 
 def _duplicate_pattern_names(ctx: ProgramContext) -> list[Issue]:
@@ -32,25 +31,8 @@ def _duplicate_pattern_names(ctx: ProgramContext) -> list[Issue]:
     return issues
 
 
-def _wildcard_quantifier(
-    node: object, pattern: Pattern, ctx: ProgramContext
-) -> list[Issue]:
-    """Check that wildcards do not carry multipliers."""
-    if isinstance(node, WildcardExpr) and node.multiplicity != "1":
-        return [
-            Issue(
-                code="wildcard-quantifier",
-                severity="error",
-                message=(
-                    f"wildcard '*' cannot carry a multiplier (pattern '{pattern.name}')"
-                ),
-            )
-        ]
-    return []
-
-
 DEFAULT_PROGRAM_RULES: tuple[ProgramRule, ...] = (_duplicate_pattern_names,)
-DEFAULT_LEAF_RULES: tuple[LeafRule, ...] = (_wildcard_quantifier,)
+DEFAULT_LEAF_RULES: tuple[LeafRule, ...] = ()
 
 
 def validate(

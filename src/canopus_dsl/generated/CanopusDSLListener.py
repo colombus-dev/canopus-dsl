@@ -53,12 +53,21 @@ class CanopusDSLListener(ParseTreeListener):
         pass
 
 
-    # Enter a parse tree produced by CanopusDSLParser#multipExpr.
-    def enterMultipExpr(self, ctx:CanopusDSLParser.MultipExprContext):
+    # Enter a parse tree produced by CanopusDSLParser#wildcardAtom.
+    def enterWildcardAtom(self, ctx:CanopusDSLParser.WildcardAtomContext):
         pass
 
-    # Exit a parse tree produced by CanopusDSLParser#multipExpr.
-    def exitMultipExpr(self, ctx:CanopusDSLParser.MultipExprContext):
+    # Exit a parse tree produced by CanopusDSLParser#wildcardAtom.
+    def exitWildcardAtom(self, ctx:CanopusDSLParser.WildcardAtomContext):
+        pass
+
+
+    # Enter a parse tree produced by CanopusDSLParser#quantified.
+    def enterQuantified(self, ctx:CanopusDSLParser.QuantifiedContext):
+        pass
+
+    # Exit a parse tree produced by CanopusDSLParser#quantified.
+    def exitQuantified(self, ctx:CanopusDSLParser.QuantifiedContext):
         pass
 
 
@@ -86,15 +95,6 @@ class CanopusDSLListener(ParseTreeListener):
 
     # Exit a parse tree produced by CanopusDSLParser#id.
     def exitId(self, ctx:CanopusDSLParser.IdContext):
-        pass
-
-
-    # Enter a parse tree produced by CanopusDSLParser#wildcard.
-    def enterWildcard(self, ctx:CanopusDSLParser.WildcardContext):
-        pass
-
-    # Exit a parse tree produced by CanopusDSLParser#wildcard.
-    def exitWildcard(self, ctx:CanopusDSLParser.WildcardContext):
         pass
 
 

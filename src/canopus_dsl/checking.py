@@ -8,7 +8,7 @@ holding program-wide facts (e.g. the known names for resolution).
 from collections.abc import Callable, Mapping
 
 from canopus_dsl.errors import Issue
-from canopus_dsl.lib import AlternativeExpr, Pattern, Program
+from canopus_dsl.lib import AlternativeExpr, Pattern, Program, SequenceExpr
 
 ProgramRule = Callable[[object], list[Issue]]
 LeafRule = Callable[[object, Pattern, object], list[Issue]]
@@ -18,11 +18,10 @@ def iter_expr_leaves(sequence: list[object]) -> list[object]:
     """Depth-first leaves; hides lists and AlternativeExpr from rules."""
     leaves: list[object] = []
     for node in sequence:
-        if isinstance(node, list):
-            leaves.extend(iter_expr_leaves(node))
-        elif isinstance(node, AlternativeExpr):
-            for alt in node.alternatives:
-                leaves.extend(iter_expr_leaves([alt]))
+        if isinstance(node, AlternativeExpr):
+            leaves.extend(iter_expr_leaves(node.alternatives))
+        elif isinstance(node, SequenceExpr):
+            leaves.extend(iter_expr_leaves(node.steps))
         else:
             leaves.append(node)
     return leaves
