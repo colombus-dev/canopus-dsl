@@ -46,12 +46,11 @@ def test_parse_resource_file(
 
 
 def test_parse_invalid_resource(canopus_patterns_resources_path: Path) -> None:
-    """Garbage input does not crash; it yields a program with no patterns."""
+    """Garbage input does not crash; error recovery builds no program."""
     listener = parse_string(
         (canopus_patterns_resources_path / "test_invalid.canopus").read_text()
     )
-    assert listener.program is not None
-    assert listener.program.patterns == []
+    assert listener.program is None
 
 
 # --- parse errors -----------------------------------------------------------

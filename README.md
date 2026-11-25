@@ -59,7 +59,8 @@ Exit codes:
 
 Diagnostics go to stderr: parse errors as `line L:C: <message>`, model issues
 as `severity: code: message`. The model goes to stdout. `parse_string` never
-raises: invalid input yields a listener with a populated `.errors` list.
+raises: invalid input yields a listener with a populated `.errors` list and no
+program (`program is None`) — only a clean parse exposes a model.
 
 ## DSL syntax
 

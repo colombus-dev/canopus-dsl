@@ -48,4 +48,8 @@ def parse_string(content: str) -> ConcreteCanopusDSLListener:
             )
         )
     canopus_listener.errors = errors
+    if errors:
+        # A parse error means no clean model: callers gate on program is not
+        # None instead of duplicating error checks (ADR-0005).
+        canopus_listener.program = None
     return canopus_listener

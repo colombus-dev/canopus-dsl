@@ -1,5 +1,7 @@
 """Parse-error collection: invalid input yields collected errors, never a raise."""
 
+import pytest
+
 from canopus_dsl import parse_string
 from canopus_dsl.errors import ParseError
 
@@ -33,6 +35,17 @@ def test_unterminated_string_is_a_lexer_error_not_a_crash():
     listener = parse_string("pattern Q = [step = \"oops]\n")
     assert len(listener.errors) >= 1
     assert any("token recognition error" in e.message for e in listener.errors)
+
+
+@pytest.mark.parametrize(
+    "input_code",
+    ["pattern P = *+\n", "pattern P = ()\n", "abcdef\n"],
+)
+def test_parse_errors_yield_no_program(input_code):
+    """A parse error leaves program None; only clean parses expose a model."""
+    listener = parse_string(input_code)
+    assert len(listener.errors) >= 1
+    assert listener.program is None
 
 
 def test_walker_crash_with_prior_error_appends_construction_failure():
