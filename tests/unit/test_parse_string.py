@@ -1,12 +1,13 @@
 """parse_string coverage: resource-fixture parsing plus grammar-level behavior.
 
-Grammar-level rules (ADR-0002, ADR-0005):
+Grammar-level rules (ADR-0002, ADR-0005, ADR-0006):
 - ``*+``/``**`` are parse errors, not a quantified wildcard (grammar owns it).
 - ``start -> end`` (empty middle) is a parse error — an anchored pipeline needs
   at least one expression between the anchors.
 - quantified primaries are legal *inside* group alternatives.
 - single-element parens ``(Q1)`` parse.
-- imports may follow pattern definitions; order is preserved.
+- imports must precede all pattern definitions (ADR-0006); an import after a
+  pattern is a parse error, and a file with only imports is a parse error.
 """
 
 from pathlib import Path
@@ -111,12 +112,26 @@ def test_single_element_parens_legal():
     assert alt.alternatives[0].name == "Q1"
 
 
-def test_import_after_pattern_and_order_preserved():
-    """Imports may follow patterns; the import list keeps its exact order."""
+def test_import_after_pattern_is_parse_error():
+    """An import after the first pattern is invalid; no program is built."""
     listener = parse_string("pattern A = *\nimport Q9\n")
+    assert len(listener.errors) >= 1
+    assert listener.program is None
+
+
+def test_imports_before_patterns_ok():
+    """Import lines may repeat, all preceding the first pattern."""
+    listener = parse_string("import A\nimport B\npattern Q = *\n")
     assert listener.errors == []
-    assert [p.name for p in listener.program.patterns] == ["A"]
-    assert listener.program.imports == ["Q9"]
+    assert listener.program.imports == ["A", "B"]
+    assert [p.name for p in listener.program.patterns] == ["Q"]
+
+
+def test_imports_only_is_parse_error():
+    """A file with imports but no pattern defines nothing; it is a parse error."""
+    listener = parse_string("import A\n")
+    assert len(listener.errors) >= 1
+    assert listener.program is None
 
 
 def test_anchored_pipeline_unchanged():

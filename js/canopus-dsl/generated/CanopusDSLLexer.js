@@ -54,15 +54,15 @@ export default class CanopusDSLLexer extends antlr4.Lexer {
     static grammarFileName = "CanopusDSL.g4";
     static channelNames = [ "DEFAULT_TOKEN_CHANNEL", "HIDDEN" ];
 	static modeNames = [ "DEFAULT_MODE" ];
-	static literalNames = [ null, "'import'", "','", "'pattern'", "'='", "'->'", 
-                         "'('", "'|'", "')'", "'['", "']'", "'+'", "'!='", 
+	static literalNames = [ null, "'import'", "','", "'pattern'", "'='", "'->'",
+                         "'('", "'|'", "')'", "'['", "']'", "'+'", "'!='",
                          "'start'", "'end'", null, null, null, null, "'*'" ];
-	static symbolicNames = [ null, null, null, null, null, null, null, null, 
-                          null, null, null, null, null, "START_OP", "END_OP", 
+	static symbolicNames = [ null, null, null, null, null, null, null, null,
+                          null, null, null, null, null, "START_OP", "END_OP",
                           "ID", "LABEL", "STRING", "WS", "WILDCARD", "COMMENT" ];
-	static ruleNames = [ "T__0", "T__1", "T__2", "T__3", "T__4", "T__5", "T__6", 
-                      "T__7", "T__8", "T__9", "T__10", "T__11", "START_OP", 
-                      "END_OP", "ID", "LABEL", "STRING", "WS", "WILDCARD", 
+	static ruleNames = [ "T__0", "T__1", "T__2", "T__3", "T__4", "T__5", "T__6",
+                      "T__7", "T__8", "T__9", "T__10", "T__11", "START_OP",
+                      "END_OP", "ID", "LABEL", "STRING", "WS", "WILDCARD",
                       "COMMENT" ];
 
     constructor(input) {
@@ -92,6 +92,3 @@ CanopusDSLLexer.STRING = 17;
 CanopusDSLLexer.WS = 18;
 CanopusDSLLexer.WILDCARD = 19;
 CanopusDSLLexer.COMMENT = 20;
-
-
-

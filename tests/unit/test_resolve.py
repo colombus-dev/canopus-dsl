@@ -10,15 +10,15 @@ from canopus_dsl.resolve import resolve
 @pytest.mark.parametrize(
     "input_code,external_patterns,expected_issue_codes",
     [
-        # Forward reference (should be legal)
-        ("pattern A = B\npattern B = *\n", None, []),
+        # Forward reference is an error
+        ("pattern A = B\npattern B = *\n", None, ["forward-reference"]),
         # Unknown reference
         ("pattern A = Nope\n", None, ["unknown-reference"]),
-        # Nested alternative resolves
-        ("""pattern A = (Q1 | (Q2 -> Q3))\n
-         pattern Q1 = *\npattern Q2 = *\npattern Q3 = *\n""", None, []),
+        # Nested alternative resolves (dependencies defined first)
+        ("""pattern Q1 = *\npattern Q2 = *\npattern Q3 = *\n
+         pattern A = (Q1 | (Q2 -> Q3))\n""", None, []),
         # Ghost in nested alternative
-        ("pattern A = (Q1 | Ghost)\npattern Q1 = *\n", None, ["unknown-reference"]),
+        ("pattern Q1 = *\npattern A = (Q1 | Ghost)\n", None, ["unknown-reference"]),
         # Import resolves with externals
         ("import Q9\npattern A = Q9\n", {"Q9": object()}, []),
         # Import without externals is warning
@@ -50,10 +50,44 @@ def test_resolution_scenarios(input_code, external_patterns, expected_issue_code
         )
 
 
-def test_forward_reference_is_legal():
-    """A pattern may reference a pattern defined later in the file."""
+def test_forward_reference_is_error():
+    """A pattern may not reference a pattern defined later in the file."""
     listener = parse_string("pattern A = B\npattern B = *\n")
-    assert resolve(listener.program) == []
+    issues = resolve(listener.program)
+    assert any(
+        i.code == "forward-reference"
+        and i.severity == "error"
+        and "B" in i.message
+        for i in issues
+    )
+
+
+def test_self_reference_is_error():
+    """A pattern's own name is not known inside its own definition."""
+    listener = parse_string("pattern A = A -> Q1\npattern Q1 = *\n")
+    issues = resolve(listener.program)
+    assert any(
+        i.code == "forward-reference" and "A" in i.message for i in issues
+    )
+
+
+def test_forward_reference_in_group_is_error():
+    """A multi-step group alternative referencing a later pattern errors."""
+    listener = parse_string(
+        "pattern A = (Q1 -> Q2 | Q3)\n"
+        "pattern Q1 = *\npattern Q2 = *\npattern Q3 = *\n"
+    )
+    issues = resolve(listener.program)
+    assert any(
+        i.code == "forward-reference" and "Q1" in i.message for i in issues
+    )
+
+
+def test_mutual_reference_has_forward_edge():
+    """A reference cycle contains at least one forward reference."""
+    listener = parse_string("pattern A = B\npattern B = A\n")
+    issues = resolve(listener.program)
+    assert any(i.code == "forward-reference" for i in issues)
 
 
 def test_unknown_reference_is_error():
@@ -69,17 +103,17 @@ def test_unknown_reference_is_error():
 
 
 def test_nested_alternative_resolves():
-    """References nested inside alternatives resolve when defined."""
+    """References nested inside alternatives resolve when defined earlier."""
     listener = parse_string(
-        "pattern A = (Q1 | (Q2 -> Q3))\n"
         "pattern Q1 = *\npattern Q2 = *\npattern Q3 = *\n"
+        "pattern A = (Q1 | (Q2 -> Q3))\n"
     )
     assert resolve(listener.program) == []
 
 
 def test_ghost_in_nested_alternative():
     """An undefined name inside an alternative is still unknown-reference."""
-    listener = parse_string("pattern A = (Q1 | Ghost)\npattern Q1 = *\n")
+    listener = parse_string("pattern Q1 = *\npattern A = (Q1 | Ghost)\n")
     issues = resolve(listener.program)
     assert any(
         i.code == "unknown-reference" and "Ghost" in i.message for i in issues
@@ -89,8 +123,8 @@ def test_ghost_in_nested_alternative():
 def test_ghost_in_sequence_alternative():
     """An undefined name inside a multi-step alternative is unknown-reference."""
     listener = parse_string(
-        "pattern A = (Q1 -> Ghost | Q2)\n"
         "pattern Q1 = *\npattern Q2 = *\n"
+        "pattern A = (Q1 -> Ghost | Q2)\n"
     )
     issues = resolve(listener.program)
     assert any(

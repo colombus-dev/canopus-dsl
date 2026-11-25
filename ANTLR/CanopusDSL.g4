@@ -2,7 +2,7 @@ grammar CanopusDSL;
 
 // ---------------------- Parser rules ----------------------
 
-program: (importPatterns | patternDef)+ EOF;
+program: importPatterns* patternDef+ EOF;
 
 importPatterns: 'import' ID (',' ID)*;
 

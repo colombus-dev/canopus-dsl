@@ -89,15 +89,15 @@ class CanopusDSLLexer(Lexer):
     modeNames = [ "DEFAULT_MODE" ]
 
     literalNames = [ "<INVALID>",
-            "'import'", "','", "'pattern'", "'='", "'->'", "'('", "'|'", 
+            "'import'", "','", "'pattern'", "'='", "'->'", "'('", "'|'",
             "')'", "'['", "']'", "'+'", "'!='", "'start'", "'end'", "'*'" ]
 
     symbolicNames = [ "<INVALID>",
-            "START_OP", "END_OP", "ID", "LABEL", "STRING", "WS", "WILDCARD", 
+            "START_OP", "END_OP", "ID", "LABEL", "STRING", "WS", "WILDCARD",
             "COMMENT" ]
 
-    ruleNames = [ "T__0", "T__1", "T__2", "T__3", "T__4", "T__5", "T__6", 
-                  "T__7", "T__8", "T__9", "T__10", "T__11", "START_OP", 
+    ruleNames = [ "T__0", "T__1", "T__2", "T__3", "T__4", "T__5", "T__6",
+                  "T__7", "T__8", "T__9", "T__10", "T__11", "START_OP",
                   "END_OP", "ID", "LABEL", "STRING", "WS", "WILDCARD", "COMMENT" ]
 
     grammarFileName = "CanopusDSL.g4"
@@ -108,5 +108,3 @@ class CanopusDSLLexer(Lexer):
         self._interp = LexerATNSimulator(self, self.atn, self.decisionsToDFA, PredictionContextCache())
         self._actions = None
         self._predicates = None
-
-

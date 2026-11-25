@@ -64,7 +64,7 @@ program (`program is None`) — only a clean parse exposes a model.
 
 ## DSL syntax
 
-A program is a sequence of pattern definitions and imports in any order:
+A program lists its imports first, then its pattern definitions:
 
 ```canopus
 import Q3, Q4
@@ -77,8 +77,11 @@ Rules:
 
 - **Patterns** — `pattern <Name> = <expr>`. Names start with an uppercase
   letter (`Q1`, `Q8_R`).
-- **Imports** — `import <Name> (, <Name>)*`. Imports may appear before, among,
-  or after pattern definitions.
+- **Imports** — `import <Name> (, <Name>)*`. Imports must precede all pattern
+  definitions; an import after a pattern is a parse error.
+- **References** — a pattern body may only name a pattern defined earlier in
+  the file or an import; forward and self references are errors. Reference
+  cycles are therefore impossible.
 - **Sequence** — steps chained with `->`, optionally anchored by `start` and
   `end`. An anchored pipeline needs at least one step between `start` and
   `end`: `start -> end` is a parse error.
