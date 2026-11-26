@@ -9,7 +9,7 @@ from canopus_dsl.generated.CanopusDSLParser import CanopusDSLParser
 def parse_string(content: str) -> ConcreteCanopusDSLListener:
     """Parse the given string aand return the initialized canopus listener.
 
-    Once initialized, the retrieved patterns are accessible via the `patterns` attribute.
+    Once initialized, the retrieved patterns are accessible via the `ConcreteCanopusDSLListener.program.patterns` attribute.
 
     Args:
         content (str): the string to parse

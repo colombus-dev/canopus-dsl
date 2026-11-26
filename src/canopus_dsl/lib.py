@@ -73,7 +73,7 @@ class ConcreteCanopusDSLListener(CanopusDSLListener):
         self.__imports: list[str] = []
 
     # ------------------------------------
-    # program
+    # program : importPatterns* patternDef+ EOF
     # ------------------------------------
     def exitProgram(self, ctx: CanopusDSLParser.ProgramContext) -> None:
         self.program = Program(patterns=self.__patterns, imports=self.__imports)
@@ -116,12 +116,15 @@ class ConcreteCanopusDSLListener(CanopusDSLListener):
         self.__values.append(items)
 
     # ------------------------------------
-    # multipExpr : WILDCARD # wildcardAtom
-    #            | primary multipOperator? # quantified
+    # wildcardAtom : WILDCARD
     # ------------------------------------
     def exitWildcardAtom(self, ctx: CanopusDSLParser.WildcardAtomContext) -> None:
         self.__values.append(WildcardExpr())
 
+
+    # ------------------------------------
+    # quantified : primary multipOperator?
+    # ------------------------------------
     def exitQuantified(self, ctx: CanopusDSLParser.QuantifiedContext) -> None:
         if ctx.multipOperator():
             last_expr: Expr = self.__values[-1]
@@ -131,7 +134,7 @@ class ConcreteCanopusDSLListener(CanopusDSLListener):
     # alternativeExpr : '(' expr ('|' expr)* ')'
     # ------------------------------------
     def exitAlternativeExpr(self, ctx: CanopusDSLParser.AlternativeExprContext) -> None:
-        expr_count = 1 + len(ctx.expr()) - 1
+        expr_count = len(ctx.expr())
         items = []
 
         for _ in range(expr_count):
@@ -181,7 +184,7 @@ class ConcreteCanopusDSLListener(CanopusDSLListener):
             self.__values.append(SequenceExpr(steps=items))
 
     # ------------------------------------
-    # condition : ID comparator STRING
+    # condition : LABEL comparator STRING
     # ------------------------------------
     def exitCondition(self, ctx: CanopusDSLParser.ConditionContext) -> None:
         key = ctx.LABEL().getText()
@@ -190,7 +193,7 @@ class ConcreteCanopusDSLListener(CanopusDSLListener):
         self.__values.append(Condition(key=key, op=op, value=value))
 
     # ------------------------------------
-    # imports : 'import' ID (',' ID)*
+    # importPatterns : 'import' ID (',' ID)*;
     # ------------------------------------
     def exitImportPatterns(self, ctx: CanopusDSLParser.ImportPatternsContext) -> None:
         self.__imports.extend([import_id.getText() for import_id in ctx.ID()])
